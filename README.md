@@ -15,7 +15,7 @@ Spin up a docker container
 >> chmod +x start_docker_container.sh
 >> ./start_docker_container.sh
 
-You can access the docker container using
+You can access the docker container from your favorite browser using
 > localhost:<host_machine_jupyter_lab_port>
 
 Your docker container should now contain a replica of this repository in /workspace.  
