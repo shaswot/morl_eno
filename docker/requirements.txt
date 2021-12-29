@@ -12,3 +12,4 @@ scikit-learn
 pathlib
 pulp
 autopep8
+gym[box2d]
