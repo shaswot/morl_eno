@@ -6,10 +6,10 @@ Build docker image using
 
 Spin up a docker container
 > Make appropriate changes to 
->> --name <whimsical_container_name>, 
->> -p <host_machine_jupyter_lab_port>:8888,
->> -p <host_machine_tensorboardb_port>:6006,
->> <some_image_name:tag>
+>> --name <whimsical_container_name>,   
+>> -p <host_machine_jupyter_lab_port>:8888,  
+>> -p <host_machine_tensorboardb_port>:6006,  
+>> <some_image_name:tag>  
 
 
 and then run the script
