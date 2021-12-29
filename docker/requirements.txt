@@ -1,0 +1,14 @@
+jupyterlab
+tensorboard
+pandas
+scipy
+matplotlib
+seaborn
+ipywidgets
+torchsummary
+pyyaml
+natsort
+scikit-learn
+pathlib
+pulp
+autopep8
