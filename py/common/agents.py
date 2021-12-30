@@ -10,6 +10,13 @@ class agent_BC:
         x = (batt-0.1)/0.9
         action = (x-self.rsp*x)/(self.rsp-2*self.rsp*x+1)
         return action
+    
+    def false_call(self, batt):
+        # required when plotting the agent's policy characteristics
+        # agent reacts to immediate battery level
+        x = (batt-0.1)/0.9
+        action = (x-self.rsp*x)/(self.rsp-2*self.rsp*x+1)
+        return action
 
 class agent_mBC:
     def __init__(self, rsp=0.95):
