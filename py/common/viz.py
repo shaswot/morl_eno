@@ -1,4 +1,12 @@
-def sorl_plot(run_log, timeslots_per_day, START_DAY=0, NO_OF_DAY_TO_PLOT = 500):
+import numpy as np
+import matplotlib.pyplot as plt
+
+def sorl_plot(run_log, 
+              timeslots_per_day, 
+              START_DAY=0, 
+              NO_OF_DAY_TO_PLOT = 500,
+              show_reward=True,
+              show_henergy=False):
     
    # Get Environment Log
     ################################################################    
@@ -43,10 +51,12 @@ def sorl_plot(run_log, timeslots_per_day, START_DAY=0, NO_OF_DAY_TO_PLOT = 500):
                      color='tab:red',linewidth=1.0, label="battery")
     sense_dc_ax.plot(menergy_obs_rec[start_index:end_index], 
                      color='tab:red',linestyle='--',linewidth=1.0, alpha=0.5,label="batt10d")
-    sense_dc_ax.plot(reward_rec[start_index:end_index],
-                     color='tab:purple', alpha=0.7,linewidth=1.0, label="reward")
-#     sense_dc_ax.plot(henergy_obs_rec[start_index:end_index],
-#                      color='k',linewidth=0.25,alpha=0.5, label="henergy")
+    if show_reward:
+        sense_dc_ax.plot(reward_rec[start_index:end_index],
+                         color='tab:purple', alpha=0.7,linewidth=1.0, label="reward")
+    if show_henergy:
+        sense_dc_ax.plot(henergy_obs_rec[start_index:end_index],
+                         color='k',linewidth=0.25,alpha=0.5, label="henergy")
 #     sense_dc_ax.plot(penergy_obs_rec[start_index:end_index],
 #                      color='k',linestyle='--',linewidth=0.25, label="penergy")
 
