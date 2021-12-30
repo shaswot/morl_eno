@@ -74,6 +74,8 @@ def sorl_plot(run_log,
                        bbox_to_anchor=(0,1.0,1,1))
     
     sense_dc_ax.set_xlabel("Days")
-    plt.show()
+    plt.close()
+    return fig
+    # plt.show()
 # End of sorl_plot
 ########################################################
