@@ -1,0 +1,34 @@
+env_tag                  = env_name   + '_t' + str(timeslots_per_day) + '_' + REQ_TYPE
+agent_tag                = agent_name + '_'  + agent_param
+
+experiment_type_tag      =  env_tag             +  "-" + agent_tag
+experiment_instance_tag  =  experiment_type_tag +  '-' + str(seed)
+
+test_results_folder  = morl_eno/results/experiment_type_tag/test
+train_results_folder = morl_eno/results/experiment_type_tag/train
+
+test_log_file = test_results_folder/    'experiment_instance_tag + '-test.npy'
+train_log_file = train_results_folder/  'experiment_instance_tag + '-train.npy'
+
+experiment_instance_result[env_location][year][reward_rec]
+                                              [ep_done_rec]
+                                              [action_log]
+                                              [sense_dc_log]
+                                              [env_log]
+                                              [sense_reward_log]
+                                              [enp_reward_log]
+
+env_log[:,0] => time
+env_log[:,1] => henergy
+env_log[:,2] => penergy
+env_log[:,3] => benergy
+env_log[:,4] => menergy
+env_log[:,5] => req_obs
+
+ENV_LIST
+sense
+
+AGENT_LIST
+agent_BC
+agent_mBC
+agent_constant
