@@ -47,7 +47,7 @@ def sorl_plot(run_log,
     start_index = START_DAY*NO_OF_TIMESLOTS_PER_DAY
     end_index = END_DAY*NO_OF_TIMESLOTS_PER_DAY
     
-    
+    time_trace = np.arange(timeslots_per_day*NO_OF_DAY_TO_PLOT)
     # Draw figure
     ##############
     fig, axs = plt.subplots(nrows=1,
@@ -61,21 +61,33 @@ def sorl_plot(run_log,
     sense_dc_ax.set_ylim(-0.1,1.1)
 
     
-    sense_dc_ax.plot(sense_dc_log[start_index:end_index], 
+    sense_dc_ax.step(time_trace,
+                     sense_dc_log[start_index:end_index],
+                     where='post',
                      color='tab:blue', alpha=0.7,linewidth=1.0, label="sense_dc")
-    sense_dc_ax.plot(req_obs_rec[start_index:end_index], 
+    sense_dc_ax.step(time_trace,
+                     req_obs_rec[start_index:end_index],
+                     where='post',
                      color='tab:orange',linestyle='--',linewidth=1.0, label="req_dc")
-    sense_dc_ax.plot(benergy_obs_rec[start_index:end_index], 
+    sense_dc_ax.step(time_trace,
+                     benergy_obs_rec[start_index:end_index],
+                     where='post',
                      color='tab:red',linewidth=1.0, label="battery")
-    sense_dc_ax.plot(menergy_obs_rec[start_index:end_index], 
+    sense_dc_ax.step(time_trace,
+                     menergy_obs_rec[start_index:end_index],
+                     where='post',
                      color='tab:red',linestyle='--',linewidth=1.0, alpha=0.5,label="batt10d")
     if show_reward:
-        sense_dc_ax.plot(reward_rec[start_index:end_index],
+        sense_dc_ax.step(time_trace,
+                         reward_rec[start_index:end_index],
+                         where='post',
                          color='tab:purple', alpha=0.7,linewidth=1.0, label="reward")
     if show_henergy:
-        sense_dc_ax.plot(henergy_obs_rec[start_index:end_index],
+        sense_dc_ax.step(time_trace,
+                         henergy_obs_rec[start_index:end_index],
+                         where='post',
                          color='k',linewidth=0.25,alpha=0.5, label="henergy")
-#     sense_dc_ax.plot(penergy_obs_rec[start_index:end_index],
+#     sense_dc_ax.step(penergy_obs_rec[start_index:end_index],
 #                      color='k',linestyle='--',linewidth=0.25, label="penergy")
 
     
