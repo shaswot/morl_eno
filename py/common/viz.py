@@ -11,6 +11,7 @@ import pathlib
 
 # CONSTANT DICTIONARY
 env_log_metric_dict = {
+                        "time":0,
                         "henergy": 1,
                         "penergy": 2,
                         "benergy": 3,
@@ -175,7 +176,10 @@ def compare_trace(results_folder, # the folder holding results of all experiment
             # if metric is in env_log
             if metric in ["henergy", "penergy", "benergy", "menergy", "req_obs"]:
                 metric_trace = experiment_traces[experiment]["env_log"][:,env_log_metric_dict[metric]]
-                axs.plot(metric_trace[start_index:end_index],
+                time_trace = np.arange(timeslots_per_day*NO_OF_DAY_TO_PLOT)
+                axs.step(time_trace,
+                         metric_trace[start_index:end_index],
+                         where='post',
                          color=experiment_color[experiment],
                          alpha=0.7,
                          linewidth=1.0,
@@ -184,7 +188,10 @@ def compare_trace(results_folder, # the folder holding results of all experiment
             # if metric is not in env_log
             else:
                 metric_trace = experiment_traces[experiment][metric]
-                axs.plot(metric_trace[start_index:end_index],
+                time_trace = np.arange(timeslots_per_day*NO_OF_DAY_TO_PLOT)
+                axs.step(time_trace,
+                         metric_trace[start_index:end_index],
+                         where='post',
                          color=experiment_color[experiment],
                          alpha=0.7,
                          linewidth=1.0,
