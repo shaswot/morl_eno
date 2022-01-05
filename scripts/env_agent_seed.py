@@ -23,52 +23,75 @@ if module_path not in sys.path:
 import common.env_lib
 import common.agents
 
+import ast
+import yaml
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--env", default="sense", type=str, help="Environment. Specified in ./py/common/env_lib.py")
-parser.add_argument("--location", default="tokyo", type=str, help="Environment Location")
-# parser.add_argument("--agent", default="agent_BC", type=str, help="type of agent")
-parser.add_argument("--param", default=70, type=int, help="agent_BC responsiveness parameter.")
-parser.add_argument("--seed", default=238, type=int, help="Set seed [default: 230]")
+parser.add_argument("--env_params", default='{}', type=str, help="Environment Parameters")
+parser.add_argument("--agent", default="agent_BC", type=str, help="type of agent")
+parser.add_argument("--agent_params", default='{"rsp":70}', type=str, help="agent parameter")
+parser.add_argument("--exp_params", default='{"rsp":70}', type=str, help="exp parameter")
+parser.add_argument("--seed", default=230, type=int, help="Set seed [default: 230]")
 
 args = parser.parse_args()
 
 # arguments
-seed      = args.seed
-env_name  = args.env
-rsp = args.param
-env_location = args.location
+# extract environment parameters
+env_type  = args.env
+env_params_str = args.env_params
+env_params = ast.literal_eval(env_params_str)
 
-# hard set arguments
-agent_name = "agent_BC"
+env_name = env_params["env_name"]
+env_location = env_params["location"]
+timeslots_per_day = env_params["timeslots_per_day"]
+prediction_horizon = env_params["prediction_horizon"] * timeslots_per_day
+offset = env_params["offset"] * timeslots_per_day
+REQ_TYPE = env_params["REQ_TYPE"]
+henergy_mean = env_params["henergy_mean"]
+
+# extact agent parameters
+agent_type = args.agent
+agent_params_str = args.agent_params
+agent_params = ast.literal_eval(agent_params_str)
+agent_name = agent_params["agent_name"]
+
+# extract experiment parameters
+exp_params_str = args.exp_params
+exp_params = ast.literal_eval(exp_params_str)
+START_YEAR = exp_params["START_YEAR"]
+NO_OF_YEARS = exp_params["NO_OF_YEARS"]
 
 # set seed
+seed= args.seed
 random.seed(seed)
 os.environ['PYTHONHASHSEED'] = str(seed)
 np.random.seed(seed)
 
+
 # create environment
-env = eval("common.env_lib."+env_name+"()")
+env = eval("common.env_lib."+env_type+"()")
 
 # other required arguments
-START_YEAR = 1995
-NO_OF_YEARS = 2#3
-timeslots_per_day = 24
-prediction_horizon = 10*timeslots_per_day
-offset = timeslots_per_day/2
-REQ_TYPE = "random"
-henergy_mean= 0.13904705134356052 # 10yr hmean for tokyo
-location = "tokyo"
+# START_YEAR = 1995
+# NO_OF_YEARS = 2#3
+# timeslots_per_day = 24
+# prediction_horizon = 10*timeslots_per_day
+# offset = timeslots_per_day/2
+# REQ_TYPE = "random"
+# henergy_mean= 0.13904705134356052 # 10yr hmean for tokyo
+ 
 
 # get root_folder
 # should point to "../morl_eno/"
 root_folder = os.path.dirname(os.getcwd())
 
 # Create agent with corresponding rsp
-agent = eval("common.agents." + agent_name + "("+ str(rsp)+")")
+agent = eval("common.agents." + agent_type + "("+ str(agent_params) +")")
 
 # Tags
-env_tag = env_name + '_t' + str(timeslots_per_day) + '_' + REQ_TYPE
-agent_tag = agent_name + "_rsp" + str(rsp)
+env_tag = env_type + '_' + env_name
+agent_tag = agent_type + '_' + agent_name
 
 # experiment tag
 # name of folder to save models and results
@@ -83,7 +106,9 @@ test_log_file = os.path.join(test_results_folder, experiment_instance_tag + '-te
 
 
 experiment_instance_result = {}
-experiment_instance_result[env_location] = {}
+experiment_instance_result["params"] = {}
+experiment_instance_result["values"] = {}
+experiment_instance_result["values"][env_location] = {}
 for year in range(START_YEAR, START_YEAR+NO_OF_YEARS):
     env.set_env(env_location, 
                 year, 
@@ -122,9 +147,7 @@ for year in range(START_YEAR, START_YEAR+NO_OF_YEARS):
 
 
     # Summarizing environmental traces for later reference
-
     env_log = year_trace['env_log']
-
     # Get henergy metrics
     henergy_rec = env_log[:,1]
     avg_henergy = henergy_rec.mean()
@@ -155,18 +178,25 @@ for year in range(START_YEAR, START_YEAR+NO_OF_YEARS):
     year_trace['downtimes'] = downtimes
 
     # Save yearly trace in experiment dictionary
-    experiment_instance_result[env_location][year] = year_trace
+    experiment_instance_result["values"][env_location][year] = year_trace
+    experiment_instance_result["params"]["env_params"] = env_params
+    experiment_instance_result["params"]["agent_params"] = agent_params
+    experiment_instance_result["params"]["exp_params"] = exp_params
+
+    
 # end for(year)
 # end for(location)
 np.save(test_log_file, experiment_instance_result)
 
 # Load npy file and output to stdout
 # Tags
-env_tag = env_name + '_t' + str(timeslots_per_day) + '_' + REQ_TYPE
-agent_tag = agent_name + "_rsp" + str(rsp)
+env_tag = env_type + '_' + env_name
+agent_tag = agent_type + '_' + agent_name
 
 # experiment tag
 # name of folder to load models and results
+env_tag = env_type + '_' + env_name
+agent_tag = agent_type + '_' + agent_name
 experiment_type_tag = env_tag  + "-" + agent_tag
 experiment_instance_tag =  experiment_type_tag + '-' + str(seed)
 
@@ -179,14 +209,19 @@ test_log_file = os.path.join(test_results_folder, experiment_instance_tag + '-te
 experiment_instance_result = np.load(test_log_file,allow_pickle='TRUE').item()    
 
 print("Experiment:", experiment_instance_tag)
+# print environmet, agent, experiment information
+print(yaml.dump(experiment_instance_result["params"]["env_params"], sort_keys=False, default_flow_style=False))
+print(yaml.dump(experiment_instance_result["params"]["agent_params"], sort_keys=False, default_flow_style=False))
+print(yaml.dump(experiment_instance_result["params"]["exp_params"], sort_keys=False, default_flow_style=False))
+
 print("LOCATION".ljust(12), "YEAR".ljust(6), "HMEAN".ljust(8), "REQ_MEAN".ljust(8), "AVG_DC".ljust(8), 
   "SNS_RWD".ljust(8), "ENP_RWD".ljust(8), "AVG_RWD".ljust(8), "DOWNTIMES".ljust(9))
 
-location_list = list(experiment_instance_result.keys())
+location_list = list(experiment_instance_result["values"].keys())
 for location in location_list:
-    yr_list = list(experiment_instance_result[location].keys())
+    yr_list = list(experiment_instance_result["values"][location].keys())
     for year in yr_list:
-        year_trace = experiment_instance_result[location][year]
+        year_trace = experiment_instance_result["values"][location][year]
         # Print summarized metrics
         print(location.ljust(12), year, end=' ')
         sense_avg_rwd = year_trace['sense_reward_log'].mean()
@@ -208,5 +243,3 @@ for location in location_list:
         print("")
 print('*'*90)
 print('\n')
-
-

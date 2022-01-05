@@ -40,7 +40,7 @@ class sense(gym.Env):
         self.offset = int(offset) # offset for request generator [when using random_day]
         self.MIN_BATT = 0.1
         self.MIN_DC = 0.1
-        self.p_horizon = p_horizon # prediction horizons
+        self.p_horizon = p_horizon # prediction horizon
         self.hmean = hmean # mean henergy if given
 ########################################################
 

@@ -92,7 +92,7 @@ class bangbang(base_agent):
         return action
 
 # create battery-centric agent parameterized by a responsiveness variable rsp
-class agent_BC(base_agent):
+class nonlinear(base_agent):
     def __init__(self, 
                  params
                 ):
@@ -117,7 +117,7 @@ class agent_BC(base_agent):
 # create battery-centric agent parameterized by a responsiveness variable rsp
 # similar to agent_BC, difference being that it responds to mean battery level
 # not immediate battery level
-class agent_mBC(base_agent):
+class nonlinear_mean(base_agent):
     def __init__(self, 
                  params = {"rsp": 0.95}
                 ):
@@ -134,7 +134,7 @@ class agent_mBC(base_agent):
 
 # always outputs the same conformity
 # this does not translate to CONSTANT DUTY CYCLE!!!! 
-class agent_constant(base_agent):
+class constant(base_agent):
     def __init__(self, 
                  params
                 ):
