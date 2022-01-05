@@ -1,17 +1,35 @@
+class base_agent:
+    # initialize agent with parameters
+    # parameters is a dictionary
+    def __init__(self,
+                 params
+                ):
+        self.params = params
+        assert type(self.params) is dict, "param should be in the form of a dictionary"
+        self.myname = params["agent_name"]
+    
+    # returns action depending on input state
+    def __call__(self, state):
+        pass
+    
+    # returns actions depending on battery value
+    # required for plotting agent characteristics
+    def false_call(self, batt):
+        pass
+
 # triggers ON when battery level increase above a threshold
 # triggers OFF when battery level decreases below a threshold
 # has a hysterisis effect
-class schmitt:
+class schmitt(base_agent):
     def __init__(self,
-                 param = {"threshold_hi": 0.95,
-                          "threshold_lo": 0.20,
-                          "val_hi": 0.9,
-                          "val_lo": 0.1}
+                 params
                 ):
-        self.threshold_hi = param["threshold_hi"]
-        self.threshold_lo = param["threshold_lo"]
-        self.val_hi = param["val_hi"]
-        self.val_lo = param["val_lo"]
+        super(base_agent, self).__init__()
+        
+        self.threshold_hi = params["threshold_hi"]
+        self.threshold_lo = params["threshold_lo"]
+        self.val_hi = params["val_hi"]
+        self.val_lo = params["val_lo"]
         self.trigger = False
         
     def __call__(self, state):
@@ -53,14 +71,15 @@ class schmitt:
 
 # triggers ON when battery level increase above a threshold
 # triggers OFF when battery level decreases below that threshold
-class bangbang:
+class bangbang(base_agent):
     def __init__(self,
-                 threshold=0.95,
-                 val_hi=0.9,
-                 val_lo=0.1):
-        self.threshold = threshold
-        self.val_hi = val_hi
-        self.val_lo = val_lo
+                 params
+                ):
+        super(base_agent, self).__init__()
+        
+        self.threshold = params["threshold"]
+        self.val_hi = params["val_hi"]
+        self.val_lo = params["val_lo"]
         
     def __call__(self, state):
         # state = [time, henergy, penergy, benergy, menergy, req_obs]
@@ -73,9 +92,12 @@ class bangbang:
         return action
 
 # create battery-centric agent parameterized by a responsiveness variable rsp
-class agent_BC:
-    def __init__(self, rsp=0.95):
-        self.rsp = rsp
+class agent_BC(base_agent):
+    def __init__(self, 
+                 params
+                ):
+        super(base_agent, self).__init__()
+        self.rsp = params["rsp"]
                
     def __call__(self, state):
         # state = [time, henergy, penergy, benergy, menergy, req_obs]
@@ -95,9 +117,12 @@ class agent_BC:
 # create battery-centric agent parameterized by a responsiveness variable rsp
 # similar to agent_BC, difference being that it responds to mean battery level
 # not immediate battery level
-class agent_mBC:
-    def __init__(self, rsp=0.95):
-        self.rsp = rsp
+class agent_mBC(base_agent):
+    def __init__(self, 
+                 params = {"rsp": 0.95}
+                ):
+        super(base_agent, self).__init__()
+        self.rsp = params["rsp"]
                
     def __call__(self, state):
         # state = [time, henergy, penergy, benergy, menergy, req_obs]
@@ -109,9 +134,12 @@ class agent_mBC:
 
 # always outputs the same conformity
 # this does not translate to CONSTANT DUTY CYCLE!!!! 
-class agent_constant:
-    def __init__(self, conformity):
-        self.action = conformity
+class agent_constant(base_agent):
+    def __init__(self, 
+                 params
+                ):
+        super(base_agent, self).__init__()
+        self.action = params["conformity"]
                
     def __call__(self, state):
         return self.action
