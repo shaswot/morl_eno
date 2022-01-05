@@ -230,7 +230,7 @@ def compare_trace(results_folder, # the folder holding results of all experiment
 
 
 def compare_agents(results_folder, # the folder holding results of all experiments
-                    environment_name,
+                    environment_tag,
                     agent_list,
                     label_list,
                     seed_list,
@@ -238,10 +238,10 @@ def compare_agents(results_folder, # the folder holding results of all experimen
                     location):
     
     # Get experiment name
-    experiment_list = [environment_name+'-'+agent for agent in agent_list]
+    experiment_list = [environment_tag+'-'+agent for agent in agent_list]
 
     # human readable names for experiments
-    label_list = agent_list
+    label_list = label_list
     
     # Assign each experiment a label (to be used in figure legend)
     experiment_label = dict(zip(experiment_list, label_list))
@@ -267,7 +267,7 @@ def compare_agents(results_folder, # the folder holding results of all experimen
             # experiment data file
             exp_results_file = os.path.join(exp_results_folder, experiment_instance_tag + '-'+ mode + '.npy') 
             exp_result = np.load(exp_results_file,allow_pickle='TRUE').item()
-            results[experiment][seed_no] = exp_result # load to dictionary
+            results[experiment][seed_no] = exp_result["values"] # load to dictionary
     
     # Check if each experiment have the same location
     location_list = []
@@ -443,7 +443,7 @@ def compare_agents(results_folder, # the folder holding results of all experimen
     downtimes_ax.grid(which='major', axis='y', linestyle='--')
 
 
-    fig.suptitle(environment_name)
+    fig.suptitle(environment_tag)
     plt.close()
     return fig
 

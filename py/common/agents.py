@@ -117,7 +117,7 @@ class nonlinear(base_agent):
 # create battery-centric agent parameterized by a responsiveness variable rsp
 # similar to agent_BC, difference being that it responds to mean battery level
 # not immediate battery level
-class nonlinear_mean(base_agent):
+class nonlinearmean(base_agent):
     def __init__(self, 
                  params = {"rsp": 0.95}
                 ):
