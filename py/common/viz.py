@@ -118,7 +118,6 @@ def compare_trace(results_folder, # the folder holding results of all experiment
                   mode,
                   location,
                   year,
-                  timeslots_per_day=24,
                   START_DAY=0,
                   NO_OF_DAY_TO_PLOT = 500):
 
@@ -138,6 +137,7 @@ def compare_trace(results_folder, # the folder holding results of all experiment
     experiment_traces = {}
 
     # load data from each experiment
+    timeslotsperday = None
     for experiment in experiment_list:
         # Load data of experiment and store in a dictionary
         experiment_instance_tag = experiment + '-' + str(seed_no)
@@ -145,7 +145,15 @@ def compare_trace(results_folder, # the folder holding results of all experiment
         exp_results_folder = os.path.join(results_folder, experiment, mode) # folder with results of the experiment
         exp_results_file = os.path.join(exp_results_folder, experiment_instance_tag + '-'+ mode + '.npy') # experiment data file
         trace = np.load(exp_results_file,allow_pickle='TRUE').item()
-        experiment_traces[experiment] = trace[location][year] # load to dictionary
+        experiment_traces[experiment] = trace["values"][location][year] # load to dictionary
+        
+        # check if timeslots_per_day are the same between experiments
+        if timeslotsperday is None: 
+            timeslotsperday = trace["params"]["env_params"]["timeslots_per_day"]
+        else:
+            assert timeslotsperday == trace["params"]["env_params"]["timeslots_per_day"], "timeslots_per_day don't match between experiments"
+            timeslots_per_day = timeslotsperday
+                
 
     # check if traces have the same length
     # we check the lenght of henergy obs trace for each experiment
