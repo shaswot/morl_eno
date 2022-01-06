@@ -22,6 +22,7 @@ if module_path not in sys.path:
 
 import common.env_lib
 import common.agents
+import common.utils
 
 import ast
 import yaml
@@ -68,19 +69,8 @@ random.seed(seed)
 os.environ['PYTHONHASHSEED'] = str(seed)
 np.random.seed(seed)
 
-
 # create environment
 env = eval("common.env_lib."+env_type+"()")
-
-# other required arguments
-# START_YEAR = 1995
-# NO_OF_YEARS = 2#3
-# timeslots_per_day = 24
-# prediction_horizon = 10*timeslots_per_day
-# offset = timeslots_per_day/2
-# REQ_TYPE = "random"
-# henergy_mean= 0.13904705134356052 # 10yr hmean for tokyo
- 
 
 # get root_folder
 # should point to "../morl_eno/"
@@ -90,16 +80,10 @@ root_folder = os.path.dirname(os.getcwd())
 agent = eval("common.agents." + agent_type + "("+ str(agent_params) +")")
 
 # Tags
-env_tag = env_type + '_' + env_name
-agent_tag = agent_type + '_' + agent_name
-
-# experiment tag
-# name of folder to save models and results
-experiment_type_tag = env_tag  + "-" + agent_tag
-experiment_instance_tag =  experiment_type_tag + '-' + str(seed)
+experiment_meta_type_tag, experiment_type_tag, experiment_instance_tag = common.utils.experiment_tag_generator(env_type, env_name, agent_type, agent_name, seed)
 
 # Folder/file to save test results
-test_results_folder = os.path.join(root_folder,"results", experiment_type_tag, "test")
+test_results_folder = os.path.join(root_folder,"results", experiment_meta_type_tag, experiment_type_tag, "test")
 if not os.path.exists(test_results_folder): 
         os.makedirs(test_results_folder) 
 test_log_file = os.path.join(test_results_folder, experiment_instance_tag + '-test.npy')    
@@ -179,67 +163,17 @@ for year in range(START_YEAR, START_YEAR+NO_OF_YEARS):
 
     # Save yearly trace in experiment dictionary
     experiment_instance_result["values"][env_location][year] = year_trace
+    experiment_instance_result["params"]["env_type"] = env_type
+    experiment_instance_result["params"]["agent_type"] = agent_type
     experiment_instance_result["params"]["env_params"] = env_params
     experiment_instance_result["params"]["agent_params"] = agent_params
     experiment_instance_result["params"]["exp_params"] = exp_params
+    experiment_instance_result["params"]["seed"] = seed
+    experiment_instance_result["params"]["experiment_instance_tag"] = experiment_instance_tag
 
-    
 # end for(year)
 # end for(location)
 np.save(test_log_file, experiment_instance_result)
 
-# Load npy file and output to stdout
-# Tags
-env_tag = env_type + '_' + env_name
-agent_tag = agent_type + '_' + agent_name
-
-# experiment tag
-# name of folder to load models and results
-env_tag = env_type + '_' + env_name
-agent_tag = agent_type + '_' + agent_name
-experiment_type_tag = env_tag  + "-" + agent_tag
-experiment_instance_tag =  experiment_type_tag + '-' + str(seed)
-
-# Folder/file to load test results from
-test_results_folder = os.path.join(root_folder,"results", experiment_type_tag, "test")
-assert os.path.exists(test_results_folder), "'" + test_results_folder + "' folder does not exist"
-test_log_file = os.path.join(test_results_folder, experiment_instance_tag + '-test.npy')   
-
-# Load data
-experiment_instance_result = np.load(test_log_file,allow_pickle='TRUE').item()    
-
-print("Experiment:", experiment_instance_tag)
-# print environmet, agent, experiment information
-print(yaml.dump(experiment_instance_result["params"]["env_params"], sort_keys=False, default_flow_style=False))
-print(yaml.dump(experiment_instance_result["params"]["agent_params"], sort_keys=False, default_flow_style=False))
-print(yaml.dump(experiment_instance_result["params"]["exp_params"], sort_keys=False, default_flow_style=False))
-
-print("LOCATION".ljust(12), "YEAR".ljust(6), "HMEAN".ljust(8), "REQ_MEAN".ljust(8), "AVG_DC".ljust(8), 
-  "SNS_RWD".ljust(8), "ENP_RWD".ljust(8), "AVG_RWD".ljust(8), "DOWNTIMES".ljust(9))
-
-location_list = list(experiment_instance_result["values"].keys())
-for location in location_list:
-    yr_list = list(experiment_instance_result["values"][location].keys())
-    for year in yr_list:
-        year_trace = experiment_instance_result["values"][location][year]
-        # Print summarized metrics
-        print(location.ljust(12), year, end=' ')
-        sense_avg_rwd = year_trace['sense_reward_log'].mean()
-        enp_avg_rwd = year_trace['enp_reward_log'].mean()
-
-        average_rwd = year_trace['avg_rwd']
-        total_downtimes = year_trace['downtimes']
-        hmean = year_trace['avg_henergy']
-        reqmean = year_trace['avg_req']
-        sense_dc_mean = year_trace['sense_dc_log'].mean()
-
-        print(f'{hmean:7.3f}',end='  ')
-        print(f'{reqmean:7.3f}',end='  ')
-        print(f'{sense_dc_mean:7.3f}',end='  ')
-        print(f'{sense_avg_rwd:7.3f}',end='  ')
-        print(f'{enp_avg_rwd:7.3f}',end='  ')
-        print(f'{average_rwd:7.3f}',end='  ')
-        print(f'{total_downtimes:5d}',end='  ')
-        print("")
-print('*'*90)
-print('\n')
+# Display results
+common.utils.display_tabular_summary(test_log_file)
