@@ -1,23 +1,25 @@
-env_tag                  = env_name   + '_t' + str(timeslots_per_day) + '_' + REQ_TYPE
-agent_tag                = agent_name + '_'  + agent_param
+# as defined in utils.py
+env_tag = env_type + '_' + env_name
+agent_tag = agent_type + '_' + agent_name
 
-experiment_type_tag      =  env_tag             +  "-" + agent_tag
-experiment_instance_tag  =  experiment_type_tag +  '-' + str(seed)
+experiment_meta_type_tag = env_tag  + "-" + agent_type
+experiment_type_tag = env_tag  + "-" + agent_tag
+experiment_instance_tag =  experiment_type_tag + '-' + str(seed)
 
-test_results_folder  = morl_eno/results/experiment_type_tag/test
-train_results_folder = morl_eno/results/experiment_type_tag/train
+test_results_folder  = morl_eno/results/experiment_meta_type_tag/experiment_type_tag/test
+train_results_folder = morl_eno/results/experiment_meta_type_tag/experiment_type_tag/train
 
 test_log_file = test_results_folder/    'experiment_instance_tag + '-test.npy'
 train_log_file = train_results_folder/  'experiment_instance_tag + '-train.npy'
 
-experiment_instance_result[env_location][year][reward_rec]
-                                              [ep_done_rec]
-                                              [action_log]
-                                              [sense_dc_log]
-                                              [env_log]
-                                              [sense_reward_log]
-                                              [enp_reward_log]
-
+experiment_instance_result["values"]-------------------------------->[env_location][year][reward_rec]
+                          ["params"]["env_type"]                                         [ep_done_rec]
+                                    ["agent_type"]                                       [action_log]
+                                    ["env_params"]                                       [sense_dc_log]
+                                    ["agent_params"]                                     [env_log]
+                                    ["exp_params"]                                       [sense_reward_log]
+                                    ["seed"]                                             [enp_reward_log]
+                                    ["experiment_instance_tag"]
 env_log[:,0] => time
 env_log[:,1] => henergy
 env_log[:,2] => penergy
@@ -29,6 +31,8 @@ ENV_LIST
 sense
 
 AGENT_LIST
-agent_BC
-agent_mBC
-agent_constant
+schmitt
+bangbang
+nonlinear
+nonlinearmean
+constant
